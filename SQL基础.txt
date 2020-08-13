@@ -1,0 +1,870 @@
+1、创建表：CREATE TABLE TABLE_NAME();
+
+2、表加字段：ALTER TABLE 表名 ADD (字段名 字段数据类型) [NULL/NOT NULL] [DEFAULT '输入默认值'];
+	     COMMENT ON COLUMN 表名.字段名 IS '字段解释';
+
+3、更改表字段数据类型：ALTER TABLE 表名 MODIFY (字段名 数据类型);
+
+4、删除字段：ALTER TABLE 表名 DROP COLUMN 字段名;
+
+5、修改字段名：ALTER TABLE 表名 RENAME COLUMN 原字段名 TO 新字段名;
+
+6、修改表名：	1、ALTER TABLE 原表名 RENAME TO 新表名;
+		2、RENAME 原表名 TO 新表名;
+
+7、删除表数据：DELETE FROM 表名 WHERE 条件;
+
+8、删除表：DROP TABLE 表名;
+
+9、数据插入：1、INSERT INTO 表名(字段名1,字段名2,...) VALUES(..,..,..);
+	     2、INSERT INTO TABLE_1 SELECT * FROM TABLE_2;
+
+10、复制表：	1、只复制表结构：CREATE TABLE 新表名 AS SELECT * FROM 被复制的表名 WHERE 1 = 2;
+		2、复制表结构和表内数据：CREATE TABLE 新表名 AS SELECT * FROM 被复制的表名;
+
+11、创建视图：CREATE OR REPLACE VIEW 视图名 AS SELECT 字段1,字段2 FROM 表名;
+
+12、删除视图：DROP VIEW 视图名;
+
+13、基本查询：SELECT T.* FROM TABLE_NAME T;
+
+14、字段别名：SELECT T.NAME AS CUST_NAME FROM TABLE_NAME T;
+
+15、模糊查询：SELECT T.* FROM TABLE_NAME T WHERE T.NAME LIKE '%A%';
+
+16、查询排序：	1、默认升序：SELECT T.* FROM TABLE_NAME ORDER BY T.ID [ASC];
+		2、降序排列：SELECT T.* FROM TABLE_NAME ORDER BY T.ID DESC;
+
+17、case...when...then语句：流程控制语句或条件控制语句
+			1、对已知的数据库中的数据，按照自己的逻辑，进行自定义分组和数据分析
+			2、用此条件控制语句，实现自定义条件分组
+			3、条件控制语句中嵌套函数达到理想的计算效果
+			如：SELECT 
+  				CASE YEAR 
+  				WHEN '1992' 
+  				THEN '生日年'  
+				ELSE  '新年' 
+  				END  DATED,NO  
+  			    FROM 
+  				DATA_TABLE;
+			如：SELECT CASE 字段名 WHEN 字段对应的数据 THEN ... END FROM 表名;
+
+18、decode函数：看作条件控制语句
+		decode(条件,值1,返回值1,值2,返回值2,...,值n,返回值n,缺省值);
+		该函数的含义如下：
+		IF 条件=值1 THEN
+　　　　		RETURN(返回值1)
+		ELSIF 条件=值2 THEN
+　　　　		RETURN(返回值2)
+　　　　		......
+		ELSIF 条件=值n THEN
+　　　　		RETURN(返回值n)
+		ELSE
+　　　　		RETURN(缺省值)
+		END IF
+		（注意是 “ elsif ” ）
+		如：SELECT T.ID,DECODE(T.ID,1,'Altair',2,'Capricorn','Unknown') AS NAME FROM TABLE_NAME T;
+
+19、无条件查询：简单查询 SELECT T.* FROM TABLE_NAME T;
+
+20、条件查询：SELECT T.* FROM TABLE_NAME T WHERE T.ID = 1;
+
+21、查询统计：SELECT COUNT(*) NUMS FROM TABLE_NAME T;
+
+22、分组查询：group by;把结果集分组（一个外键id可以是一组，因为外键可以重复，可以有多个）显示，再配合其它函数
+	（如：min(id)，count(*)等等条件），把组里面的内容，按条件展示出来。
+	      SELECT T.ID,COUNT(*) NUMS FROM TABLE_NAME T GROUP BY T.ID;
+	注意：在使用group by 时，有一个规则需要遵守，即出现在select列表中的字段，如果没有在组函数中，那么必须出现在group by 子句中。(select中的字段不可以单独出现，必须出现在group语句中或者在组函数中)
+
+23、多表查询：SELECT T1.ID,T1.NAME,T2.JOB FROM TABLE_NAME T1,TABLE_NAME T2 WHERE T1.ID = T2.ID;
+
+24、inner join：等值连接。与join相同，结果集返回同时匹配两个表中的数据，类似交集。
+		SELECT COLUMN_NAME
+		FROM TABLE1
+		INNER JOIN TABLE2
+		ON TABLE1.COLUMN_NAME=TABLE2.COLUMN_NAME;
+
+25、left join：左外连接，从左表（table1）返回所有的行，即使右表（table2）中没有匹配。如果右表中没有匹配，
+	       则结果为 NULL。
+		SELECT COLUMN_NAME
+		FROM TABLE1
+		LEFT JOIN TABLE2
+		ON TABLE1.COLUMN_NAME=TABLE2.COLUMN_NAME;
+
+26、right join：右外连接，从右表（table2）返回所有的行，即使左表（table1）中没有匹配。如果左表中没有匹配，
+		则结果为 NULL。
+		SELECT COLUMN_NAME
+		FROM TABLE1
+		RIGHT JOIN TABLE2
+		ON TABLE1.COLUMN_NAME=TABLE2.COLUMN_NAME;
+
+27、full join：全连接，只要左表（table1）和右表（table2）其中一个表中存在匹配，则返回数据。
+		SELECT COLUMN_NAME
+		FROM TABLE1
+		FULL [OUTER] JOIN TABLE2
+		ON TABLE1.COLUMN_NAME=TABLE2.COLUMN_NAME;
+28、union：（类似并集）合并两个或多个 SELECT 语句的结果，且不允许显示重复的值
+		SELECT COLUMN_NAME FROM TABLE1
+		UNION
+		SELECT COLUMN_NAME FROM TABLE2;
+
+29、union all：合并两个或多个 SELECT 语句的结果，且允许显示重复的值
+		SELECT COLUMN_NAME FROM TABLE1
+		UNION ALL
+		AELECT COLUMN_NAME FROM TABLE2;
+
+30、minus：差集(显示 【属于语句1】 但 【不属于语句2】 的结果集)
+	   运用在两个 SQL 语句上。它先找出第一个 SQL 语句所产生的结果，
+	   然后看这些结果有没有在第二个 SQL 语句的结果中。
+	   如果有的话，那这一笔数据就被去除，不会在最后的结果中出现；如果没有，则显示。
+	   SELECT COLUMN_NAME FROM TABLE1
+	   MINUS
+	   SELECT COLUMN_NAME FROM TABLE2;
+
+31、intersect：(类似交集)返回在两个表中同时存在的一样的数据；
+		SELECT COLUMN_NAME FROM TABLE1
+		INTERSECT
+		AELECT COLUMN_NAME FROM TABLE2;
+
+32、nvl：nvl(expr1,expr2)：如果第一个参数expr1为空则显示expr2的值，如果第一个参数不为空则显示expr1原本的值
+	 expr2的值类型要保持与expr1的值类型一致
+
+33、nvl2：nvl(expr1,expr2,expr3)：如果第一个参数的值不为空则显示expr2的值，如果第一个参数为空则显示expr3的值
+          值类型可以一致也可以不一致。
+
+    nullif(expr1,expr2)：如果expr1和expr2的值相等则返回空(null)，否则返回第一个参数的值
+
+34、coalesce：与nvl函数相似，coalesce(expr1,expr2,expr3,...,exprn)：依次判断各个表达式的值是否为空，
+	      遇到非空值即停止并返回该值，如果所有表达式都是空，则返回一个空值。
+
+35、substr：字符截取函数
+	格式：substr(String str,int a,int b)
+	      str表示要操作的字符串;字符串中有空格时,空格也算一个字符;
+	      a表示截取字符串的开始位置(当a=0或a=1时都是从第一位开始截取),如果a<0时,则是从后往前数
+	      	如：SUBSTR('HelloWorld',-1,3)截取的是d,从d开始往后截取,因为d后面没有字符,所以只截取到d;
+		    SUBSTR('HelloWorld',-3,3)截取的是rld
+		    SUBSTR('HelloWorld',-3)截取的是rld,当没有参数b时,负数a都是从后往前截取相应的位数
+	      b表示要截取的字符串长度(b可以不写，当b不设置时表示从a开始截取到字符串的最后)。
+
+36、substrb：字节截取函数,在GBK中,一个汉字占2个字节;在UTF-8中,一个汉字占3个字节。
+		如：substrb('你好',3)截取的是好
+		截取位数不够时，会补空格，如：
+		SUBSTRB('海边的维尔罗娜',2)返回结果：  边的维尔罗娜
+		SUBSTRB('海边的维尔罗娜',3)返回结果： 边的维尔罗娜
+
+37、substrc：按Unicode编码截取
+
+38、length：表示字符串的字符长度。语法格式：length(String str)；str表示要判断的字符串
+		如：SELECT LENGTH('字符串') FROM DUAL; 返回3
+
+39、lengthb：表示字符串的字节长度。如：select length('字符串') from dual; 返回9
+		（一个汉字，编码如果是UTF-8，在 oracle 数据库中占3个字节；如果编码是GBK，占2个字节）
+
+40、lengthc：按Unicoe编码判断字符串的长度
+
+41、instr：字符查找函数，在Oracle/PLSQL中，instr函数只会检索一次，即从头到尾结束。
+	   1、instr(String1,String2)其中，String1表示源字符串，String2表示目标字符串，函数表示在源字符串中检索查找目标字符串出现的位置。
+	   如：SELECT INSTR('helloworld','l') FROM DUAL; --返回结果：3    默认第一次出现“l”的位置
+	       SELECT INSTR('helloworld','lo') FROM DUAL; --返回结果：4    即“lo”同时(连续)出现，“l”的位置
+	   2、instr(String1,String2[,start_position[,nth_appearance]])其中，start_position表示在源字符串String1开始检索的位置，nth_appearance表示第几次出现目标字符String2。
+	   解析：String2的值要在String1中查找，根据start_position设置的数值(即开始检索的位置)在String1中检索，检索第nth_appearance(几)次出现String2.
+	   如果后面没有符合出现次数的目标字符，则返回0.
+	   如：SELECT INSTR('helloworld','l',2,2) FROM DUAL;  --返回结果：4    即：在"helloworld"的第2号位置(e)开始，查找第二次出现的“l”的位置
+	   SELECT INSTR('helloworld','l',-2,2) FROM DUAL;  --返回结果：4    表示：在"helloworld"的倒数第2号位置(l)开始，往回查找第二次出现的“l”的位置
+	   SELECT INSTR('海边的维尔罗娜和维尔罗娜','尔',6,2) FROM DUAL;  --返回结果0，因为从第6位开始查找，并没有第二次出现的字符“尔”
+
+42、lpad：lpad函数从左边对字符串使用指定的字符进行填充。
+	  lpad(String, padded_length[,pad_string])。
+	  String表示要被填充的字符串，
+	  padded_length表示填充之后的字符串长度，也就是该函数返回的字符串长度，如果这个值比原字符串的长度要短，lpad函数将会把字符串String截取成从左到右的n个字符;如果该值很大，则pad_string会多次填充直到符合长度值并输出显示
+	  pad_string表示填充字符串，是个可选参数，这个字符串会填充到String的左边，如果这个参数未写，则默认为空字符
+
+43、rpad：语法：rpad(String,padded_length[,pad_string])
+	  从右边对字符串进行填充，用法和意义同上
+
+44、trim：
+	  1、去除指定字符的前后空格，如：SELECT TRIM(' DD DF ') FROM DUAL;返回DD DF
+	  2、去除指定的字符，trim([leading|trailing|both] trim_char from string),(注意：trim_char只能是单个字符),表示字符串string被去除了前面|后面|前后面（leading|trailing|both）的字符trim_char，默认去除方式为both
+	  如：SELECT TRIM(LEADING 'd' FROM 'dfssa') FROM DUAL; 返回fssa
+	  SELECT TRIM(LEADING 's' FROM 'ssadsfg') FROM DUAL; 返回adsfg,使用leading会将左边指定的字符都去除,both、trailing同理
+
+45、ltrim：1、去除指定字符的左边的空格，如：SELECT LTRIM(' dd df ') FROM DUAL;返回dd df 
+	   2、可以去除多个字符，ltrim(string1,string2)表示将字符串string1去除左边与string2匹配的字符，若无匹配则结束返回string1
+	   如：SELECT LTRIM('sfsfaas','sf') FROM DUAL;返回aas
+
+46、rtrim：用法与ltrim一样，意义上是去除右边的空格和字符，同样可以去除多个字符
+
+47、replace：替换字符串，一般在更新(update)数据库中的数据时会用到replace。
+	     replace(原字段，“原字段旧内容”,“原字段新内容”)
+	     如：UPDATE DEMO SET NAME = REPLACE(NAME,'零一','零二');
+
+48、to_char：将数值型或者日期型转化为字符型;
+		如：SELECT TO_CHAR(SYSDATE,'Day,HH24:MI:SS') FROM DUAL;
+		    返回 Tuesday,17:16:36 
+		    其中，sysdate是oracle中获取当前系统时间的关键字
+
+49、extract：用于从一个date或者interval类型中截取到特定的部分
+	     语法：extract([year|month|day|hour|minute|second]|[timezone_hour|timezone_minute]|
+	                   [timezone_region|timezone_abbr]
+			   from [date_value|interval_value])
+	     如：SELECT EXTRACT(YEAR FROM SYSDATE) FROM DUAL;
+	         SELECT EXTRACT(YEAR FROM DATE'2020-01-01') YEAR FROM DUAL;
+		 注意：从date类型(YYYY-MM-DD)中只能截取year,month,day;
+		 select extract(timezone_region from timestamp '2013-11-30 22:00:00 -8:00') from dual;
+	     extract()函数还能获取两个日期之间的具体时间间隔：
+	     	如：SELECT EXTRACT(DAY FROM DT2-DT1) DAY
+			  ,EXTRACT(HOUR FROM DT2-DT1) HOUR
+			  ,EXTRACT(MINUTE FROM DT2-DT1) MINUTE
+			  ,EXTRACT(SECOND FROM DT2-DT1) SECOND
+		    FROM
+			(SELECT TO_TIMESTAMP('2013-02-04 15:07:00','YYYY-MM-DD HH24:MI:SS') DT1,TO_TIMESTAMP('2013-11-30 22:08:46', 'YYYY-MM-DD HH24:MI:SS') DT2 
+			FROM DUAL);
+	     获取下一年度：
+	     	SELECT EXTRACT(YEAR FROM SYSDATE)+1 FROM DUAL;
+
+	补充：interval 'integer[-integer]' {year|month}[(precision)][to {year|month}]
+	     interval数据类型常用来表示一段时间差,时间差只精确到年和月.precision为年或月的精确域,有效范围是0到9,默认值为2
+	     如：1、interval '123-2' year(3) to month    
+		   表示:123年2个月,"year(3)"表示年的精度为3,"123"刚好为3为有效数值,如果该处year(n),n<3就会出错,注意默认是2
+		 2、interval '123' year(3)
+		   表示: 123年0个月
+		 3、interval '300' month(3)
+		   表示: 300个月, 该处month的精度是3
+
+50、trunc：
+	1、TRUNC函数处理数字：
+		语法：TRUNC(NUMBER[,DECIMALS])
+		其中，NUMBER表示要被操作的数字；DECIMALS表示要保留小数点后的位数，不写时表示小数点后全部去掉
+		如：SELECT TRUNC(123.45) FROM DUAL; 返回结果：123
+		    SELECT TRUNC(123.45,1) FROM DUAL; 返回结果：123.4
+		    当DECIMALS为负数时，表示为小数点左边指定位数后面的部分都去掉，均以0记，与取整类似。如果设置的负数位数大于或等于整数的位数时，则返回为0。
+		    SELECT TRUNC(126.45,-1) FROM DUAL; 返回结果：120
+		    SELECT TRUNC(126.45,-3) FROM DUAL; 返回结果：0
+	2、TRUNC函数处理日期：以指定元素格式去除一部分的日期值。
+		语法：TRUNC(DATE[,FMT])
+		其中：DATE为必要的日期类型参数；FMT参数可忽略，是日期格式，如YYYY,DD,MI等，用以指定的元素格式来截去输入的日期值，忽略时则由最近的日期截去。
+		按年截取，可以表示为：YYYY、YEAR
+		按月截取，可以表示为：MM、MONTH
+		按日截取，可以表示为：DD、D、DAY
+		如：SELECT TRUNC(SYSDATE,'YYYY') FROM DUAL; 返回结果：01-JAN-20 --返回当年的第一天
+		    SELECT TRUNC(SYSDATE,'MM') FROM DUAL; 返回结果：01-JULY-20 --返回当月的第一天
+		    SELECT TRUNC(SYSDATE,'DD') FROM DUAL; 返回结果：26-JULY-20 --返回当前周的第一天
+		    SELECT TRUNC(TIME,'MM') FROM (SELECT CAST('01-JAN-2020 5:36:20' AS TIMESTAMP) AS TIME FROM DUAL); 返回结果：01-JAN-2020
+		    cast函数：用于数据类型的转换
+		    	语法：CAST(列名/值 AS 数据类型)
+			如：CAST('123' AS INT)  --将字符串类型转换为整型
+			    CAST(123 AS VARCHAR2(30))  --将整型转换为字符串类型
+		
+51、to_date：	将字符串数据类型转换为日期数据类型。
+		如：SELECT TO_DATE('2020-05-20','YYYY-MM-DD') FROM DUAL;
+
+52、to_number：	to_number()函数是oracle中常用的类型转换函数之一，是将一些处理过的按一定格式编排过的字符串
+		变回数值型的格式。
+		1、to_number()函数可以将char或varhar2的String类型数据转换为一个number类型的数据。
+		2、注意被转换的字符串必须符合数值类型格式，如果被转换的字符串不符合数值型格式，oracle将报错。
+		3、to_char函数和to_number()函数的功能刚好相反。
+		如：1、SELECT TO_NUMBER('123') FROM DUAL;  返回结果：123
+		    2、如果数字在格式范围内的话，就是正确的，否则就是错误的：
+		    	SELECT TO_NUMBER('$12345.678', '$999999.99') FROM DUAL;  返回结果：报错
+			SELECT TO_NUMBER('$12345.678', '$999999.999') FROM DUAL;  返回结果：12345.678
+		    3、可以用来实现进制转换；16进制转换为10进制：
+		    	SELECT TO_NUMBER('19f','xxx') FROM DUAL;  返回结果：415
+
+53、round：round(number[,decimal_places])其中，number表示要被操作的数据；decimal_places表示小数取的位数,不写则默认为0
+	   可以为负数；round函数存在四舍五入
+	   如：SELECT ROUND(123.456,0) FROM DUAL; 返回：123
+	       SELECT ROUND(123.456,1) FROM DUAL; 返回：123.5
+	       SELECT ROUND(-123.456,2) FROM DUAL; 返回：-123.46
+	       SELECT ROUND(-123.456,-2) FROM DUAL; 返回：-100
+
+54、abs：绝对值函数。
+	语法：abs(number)
+	如：SELECT ABS(-9) FROM DUAL;  返回结果：9
+	补充：sign函数：sign(n)：若n>0,返回1; 若n<0,返回-1; 若n=0,返回0
+		如：SELECT SIGN(9) FROM DUAL;  返回结果：1
+		    SELECT SIGN(-9) FROM DUAL;  返回结果：-1
+		    SELECT SIGN(0) FROM DUAL;  返回结果：0
+
+55、power：幂函数。
+	语法：power(x,y) ：返回x的y次幂
+	如：SELECT POWER(2,2) FROM DUAL;  返回：4
+	类似函数：exp(n)：返回 e 的 n 次幂
+
+56、ceil：取数值最小的整数值。ceil(number)，取得大于等于number的最小整数。向上取整。
+
+57、floor：取数值最大的整数值。floor(number)，取得小于等于number的最大整数。向下取整。
+
+58、rank() over：跳跃排序，如果有两个第一名时，第三个的排名就是第三名。
+		语法：1、rank() over(order by 排序字段 降/升序)
+		      2、rank() over(partition by 分组字段 order by 排序字段 降/升序)
+		      如：rank() over(partition by A order by B)表示先按照A进行分组，组内的数据按照B的方式进行排序
+		      SELECT EMPNO,SAL,RANK() OVER(ORDER BY SAL) FROM EMP;
+
+59、dense_rank() over：连续排序，如果有两个第一名时，第三个排名就是第二名。
+		语法：dense_rank() over([partition by 字段 ]order by 字段)
+		如：SELECT EMPNO,SAL DENSE_RANK() OVER(ORDER BY SAL) FROM EMP;
+
+60、row_number() over：从1开始为每一条分组记录分配一个数字编号。
+		语法：row_number() over([partition by 字段名1 ]order by 字段名2)表示根据字段名1分组后，在组内根据字段名2排序，函数计算的值表示每组内部排序后的顺序编号(编号是连续的唯一的，没有重复值)
+		如：SELECT EMPNO,SAL ROW_NUMBER() OVER(ORDER BY SAL) FROM EMP;
+
+		补充：利用row_number() over函数去重，在SQL语句中加上where条件，比如where id = 1,重复数据中只剩下id为1的那条数据。
+		SELECT * FROM (SELECT ID,NAME,PRICE,ROW_NUMBER() OVER(PARTITION BY ID ORDER BY PRICE DESC)AS ROW_ID FROM TABLE_1)S WHERE S.ROW_ID= 1;
+
+61、sum() over：sum(...) over([partition by 字段名1 ]order by 字段名2) 累加的过程具体化
+		当有partition by时，累加限制在字段名1的组内，无partition by时，表数据按字段名2的顺序进行累加
+	如：字段a包含四条数据：1，2，3，4
+	    使用sum(a)时，返回10
+	    使用sum(a) over([partition by 字段1 ]order by 字段2) 返回：1，3，6，10 
+
+62、avg() over：类似sum() over函数，根据数据量多次求平均值
+		如：字段a包含四条数据：1，2，3，4
+		使用avg(a) over([partition by 字段1 ]order by 字段2) 返回：1，1.5，2，2.5
+		计算方式分别为：1=1/1，1.5=(1+2)/2，2=(1+2+3)/3，2.5=(1+2+3+4)/4
+
+63、max() over：max(字段) over([partition by 字段1 ]order by 字段2)
+		每条数据都与之前的数据进行比较，取其中最大的数据，表中有多少条数据，这个最大值就会返回多少次
+		如：字段a包含四条数据：4，3，2，1
+		max(a) over([partition by 字段1 ]order by 字段2) 返回：4，4，4，4
+
+64、min() over：类似max() over ，返回的是最小值
+		min(字段) over([partition by 字段1 ]order by 字段2)
+		如：字段a包含四条数据：1，2，3，4
+		min(a) over([partition by 字段1 ]order by 字段2) 返回：1，1，1，1
+
+65、索引(index)：
+	索引是关系数据库中用于存放每一条记录的一种对象，主要目的是加快数据的读取速度和完整性检查。
+	建立索引是一项技术性要求高的工作。一般在数据库设计阶段的与数据库结构一起考虑。
+	应用系统的性能直接与索引的合理直接有关。
+	创建索引：CREATE INDEX 索引名 ON 表名(列名);
+	创建组合索引：CREATE INDEX 索引名 ON 表名(列名1,列名2,...);
+
+66、修改索引：	ALTER INDEX 索引名 REBUILD;
+		作用：DBA经常用 rebuild 来重建索引可以减少硬盘碎片和提高应用系统的性能。
+
+67、删除索引：DROP INDEX 索引名;
+
+68、查看索引：SELECT * FROM ALL_INDEXES WHERE TABLE_NAME = '表名';
+
+69、重命名索引：ALTER INDEX 原索引名 RENAME TO 新索引名;
+
+70、合并索引：
+	(表使用一段时间后在索引中会产生碎片，此时索引效率会降低，
+	可以选择重建索引或者合并索引,合并索引方式更好些，无需额外存储空间，代价较低)
+	ALTER INDEX 索引名 COALESCE;
+
+71、重建索引：
+		1、删除原来的索引，重新建立索引；
+		2、ALTER INDEX 索引名 REBUILD;
+
+72、非空约束(not null)：默认情况,表的列接受null值。not null约束强制字段始终包含值,如果不向字段添加值,就无法插入数据或更新数据。
+	1、建立数据库表时约束字段内容不能为空：
+		CREATE TABLE STUDENT(
+			sno number(10) primary key,
+			sname varchar2(100) not null
+		);
+	2、修改表时设置非空约束：
+		CREATE TABLE STUDENT(
+			sno number(10) primary key,
+			sname varchar2(100)
+		);
+		ALTER TABLE STUDENT MODIFY SNAME DATATYPE NOT NULL;
+
+73、主键约束(primary key)：唯一标识数据库表中的每条记录数据。主键必须包含唯一的值;主键列不能包含null值;每个表必有且只有一个主键。
+		1、CREATE TABLE STUDENT(
+			sno number(6),
+			sname varchar2(15),
+			constraints pk_student primary key (sno) --表级别设置主键(pk_student，这是约束名)
+		   );
+		2、CREATE TABLE STUDENT(
+			sno number(6) primary key ,--列级别设置主键 简化的操作
+			sname varchar2(15)
+		   );
+		3、组合式主键，只有指定的主键的列 数据都一样 才不能写进表中：
+		   CREATE TABLE STUDENT(
+			sno number(6),
+			sname varchar2(15),
+			constraints pk_student primary key (sno,sname)--表级别设定主键
+		   );
+
+74、添加主键约束：ALTER TABLE 表名 ADD CONSTRAINTS 主键约束名 PRIMARY KEY(列名);
+
+75、修改主键名：
+		1、数据表有主键但无主键约束名
+		先删除之前的主键，后添加主键
+		a、ALTER TABLE 表名 DROP PRIMARY KEY;
+		b、ALTER TABLE 表名 ADD PRIMARY KEY(想要更改的字段名称);
+		2、数据表有主键也有主键约束名
+		（1）删除已有的主键约束名
+		a. 若已知主键约束名：ALTER TABLE 表名 DROP CONSTRAINT 约束名 ;
+		b. 若不知主键约束名：
+		SELECT * FROM USER_CONS_COLUMNS C WHERE C.TABLE_NAME='表名';
+		先查询出该表的主键约束名，再执行
+		ALTER TABLE  表名 DROP CONSTRAINT 约束名；
+		（2）增加新的主键约束
+		ALTER TABLE 表名 ADD CONSTRAINT 约束名 PRIMARY KEY(字段名);
+
+76、添加外键约束(foreign key)：一个表中的foreign key指向另一个表中的unique(唯一约束的键,包括主键)。
+		1、创建表时设置外键约束：
+			CREATE TABLE A(
+			      a_id  number(10) primary key,
+			      a_name varchar2(10)
+			);
+			CREATE TABLE B(
+			      b_age  number(10),
+			      b_job  varchar2(20),
+			      b_a_id  number(10),
+			      constraint fk_b_a_id foreign key(b_a_id) references a(a_id)
+			);
+		2、建表之后追加设置外键约束：
+		  	ALTER TABLE 从表表名 ADD CONSTRAINT 外键约束名称 FOREIGN KEY(列名) REFERENCES 主表表名(主键列名);
+			如：ALTER TABLE B ADD CONSTRAINT FK_B_A_ID FOERIGN KEY(B_A_ID) REFERENCES A(A_ID);
+
+77、禁用/删除外键约束：	
+		禁用/启用外键约束：
+		1、ORACLE数据库中的外键约束名都在表user_constraints中可以查到。其中constraint_type='R'表示是外键约束。
+		2、启用外键约束的命令为：ALTER TABLE TABLE_NAME ENABLE CONSTRAINT CONSTRAINT_NAME 
+		3、禁用外键约束的命令为：ALTER TABLE TABLE_NAME DISABLE CONSTRAINT CONSTRAINT_NAME
+		4、然后再用SQL查出数据库中所有外键的约束名：
+		select 'alter table '||table_name||' enable constraint '||constraint_name||';' from user_constraints where constraint_type='R';
+		select 'alter table '||table_name||' disable constraint '||constraint_name||';' from user_constraints where constraint_type='R';
+		删除外键约束：
+		select 'alter table '||table_name||' drop constraint '||constraint_name||';' from user_constraints where constraint_type='R';
+
+78、创建唯一约束(unique):唯一标识数据库表中的每条记录数据。
+		(primary key约束拥有自动定义的unique约束,每个表可以有多个unique约束)
+		1、单列唯一性约束：
+			CREATE TABLE A(
+				id number(10) not null unique,
+				name varchar2(10)
+			);
+		2、命名唯一性约束或定义多列唯一性约束：
+			CREATE TABLE A(
+				id number(10),
+				name varchar2(10),
+				age number(10),
+				constraint uc_a unique(id,name)
+			);
+		3、建表后添加唯一性约束：
+				1、ALTER TABLE 表名 ADD UNIQUE(列名);
+				2、ALTER TABLE 表名 ADD CONSTRAINT 唯一性约束名 UNIQUE(列名1,列名2,...);
+		4、撤销/删除唯一性约束：
+				ALTER TABLE 表名 DROP CONSTRAINT 唯一性约束名;
+		5、禁用/启用唯一性约束：
+				禁用：ALTER TABLE 表名 DISABLE CONSTRAINT 唯一性约束名;
+				启用：ALTER TABLE 表名 ENABLE CONSTRAINT 唯一性约束名;
+
+79、检查约束(check)：用于限制列中的取值范围、格式。
+		1、单列检查约束：
+			CREATE TABLE A(
+				id number(10) not null check(id>0),
+				name varchar2(10)
+			);
+		2、多列检查约束、设置约束名：
+			CREATE TABLE A(
+				id number(10) not null,
+				name varchar2(10),
+				tel number(20) not null,
+				constraint chk_a check(id>0 and length(tel)=11)
+			);
+		3、建表后添加检查约束：
+			1、ALTER TABLE 表名 ADD CHECK(列名);
+			2、ALTER TABLE 表名 ADD CONSTRAINT 检查约束名 CHECK(列名1限制条件 AND 列名2限制条件 AND ...);
+		4、删除检查约束：
+			ALTER TABLE 表名 DROP CONSTRAINT 检查约束名;
+		5、禁用/启用检查约束：
+			1、禁用：ALTER TABLE 表名 DISABLE CONSTRAINT 检查约束名;
+			2、启用：ALTER TABLE 表名 ENABLE CONSTRAINT 检查约束名;
+		
+80、删除主键约束：
+		1、数据表有主键但无主键约束名：ALTER TABLE 表名 DROP PRIMARY KEY;
+		2、数据表有主键也有主键约束名：ALTER TABLE 表名 DROP CONSTRAINT 主键约束名;
+
+--------------------------------------------------------------------------------------------------------------------------
+补充：
+1、视图：视图是从一个或多个表(视图)导出的虚拟的表，其内容由查询定义。具有普通表的结构，但不实现数据存储。
+	对视图的修改：单表视图一般用于查询和修改，会改变基本表的数据。
+	多表视图一般用于查询，不会改变基本表的数据。
+	创建视图：CREATE OR REPLACE VIEW 视图名 AS SELECT 字段 FROM 表名;
+	从视图中检索数据：SELECT * FROM 视图名;
+	删除视图：DROP VIEW 视图名;
+
+	作用：1、简化了操作，把经常使用的数据定义为视图
+		 比如在查询时用到很多聚合函数等，同时还要显示其他字段的信息，可能还关联到其他的表，此时的SQL语句会很长，如果这个动作频繁发生，就可以创建一个视图，之后只需要查询这个view就够了，提高了效率。
+	      2、安全性。用户只能查询和修改能看到的数据。
+	      	视图是虚拟的，物理上是不存在的，只是一个存储了数据的集合，建立视图时可以将基表中的重要字段信息不放在视图中显示，其它用户就看不到这些重要信息；用户对视图也不能随意更改和删除，保证了安全性。且视图是动态的数据集合，视图内的数据是随着基表数据的更新而更新。
+	      3、逻辑上的独立性，屏蔽了真实表的结构带来的影响。
+	      	视图可以使用应用程序和数据库表在一定程度上独立。如果不使用视图，应用一定是建立在表上的；使用视图时，程序可以建立在视图上，从而将程序和数据库表分离开来。
+	缺点：1、性能差。
+		数据库必须把视图查询转化成对基本表的查询，如果这个视图是由一个复杂的多表查询所定义，那即使是视图的简单查询，数据库也要把它变成一个复杂的结合体，需要花费一定的时间。
+	      2、修改限制。
+	      	当用户要对视图某些信息作修改时，数据库必须把它转化成对基本表的某些信息的修改，对于简单视图修改可能很方便，对于复杂视图，修改操作可能是不能实现的。
+
+2、删除表中重复值(表名：D，表关键键值：ID)
+单个字段：
+	1、查找表中多余的重复记录，重复记录是根据单个字段（如：ID）来判断:
+	SELECT * FROM D WHERE ID IN (SELECT ID FROM D GROUP BY ID HAVING COUNT(ID) > 1);
+	2、删除表中多余的重复记录，重复记录是根据单个字段（如：ID）来判断，只留有ROWID最小的记录:
+	DELETE FROM D WHERE ID IN (SELECT ID FROM D GROUP BY ID HAVING COUNT(ID) > 1) 
+	AND ROWID NOT IN (SELECT MIN(ROWID) FROM D GROUP BY ID HAVING COUNT(*) > 1);
+
+多个字段：
+	1、查找表中多余的重复记录（多个字段，如：ID,NAME）
+	SELECT * FROM D WHERE (ID,NAME) IN (SELECT ID,NAME FROM D GROUP BY ID,NAME HAVING COUNT(*) > 1);
+	2、删除表中多余的重复记录（多个字段，如：ID,NAME），只留有ROWID最小的记录
+	DELETE FROM D WHERE (ID,NAME) IN (SELECT ID,NAME FROM D GROUP BY ID,NAME HAVING COUNT(*) > 1) 
+	AND ROWID NOT IN (SELECT MIN(ROWID) FROM D GROUP BY ID,NAME HAVING COUNT(*)>1);
+
+3、lead函数和lag函数：
+	lead：查找一个字段的后N行数据作为独立的列
+	LEAD(FIELD,NUM,DEFAULT) OVER(PARTITION BY ... ORDER BY ...)
+	其中，field表示要查找的字段，num表示往后查找num行的数据，default表示默认值(不写默认为null)
+	lag：查找一个字段的前N行数据作为独立的列
+	LAG(FIELD,NUM,DEFAULT) OVER(PARTITION BY ... ORDER BY ...)
+	其中，field表示要查找的字段，num表示往前查找num行的数据，default表示默认值(不写默认为null)
+
+4、rowid和rownum：
+	rownum,rowid都叫伪列。
+	rownum：
+	获取查询出的数据的顺序
+	rownum是逻辑上的编号，且其值总是从1开始，每行的rownum不是固定的。
+	rownum是动态的，必须先有结果集，再给这个结果集加上一个列rownum。
+	查询条件不能是rownum>一个数字，因为该函数是先产生一个结果集，再产生一条rownum为1的记录，不会符合查询条件，因此只会查询出空结果集；查询条件时只能用<或<=
+	rowid：
+	查询数据的存放地址，主要利用唯一性来删除重复数据
+	rowid是物理存在的编号，实际存在的一个列，是一种数据类型，但并没有存储在表中，不支持增删改操作，只能用于查询；
+	若数据库文件没有移动，则每行的rowid一般是固定不变的。
+	即使数据是重复的，rowid肯定也不会重复；
+
+5、宽表和窄表：
+	宽表：字面意义上就是字段比较多的数据库表。
+	      通常是指业务主题相关的指标、维度、属性关联在一起的一张数据库表。
+	      由于把不同的内容都放在同一张表存储，宽表已经不符合三范式的模型设计规范。
+	      缺陷：主要坏处是数据的大量冗余，
+	      优点：好处在于查询性能的提高与便捷。
+	      这种宽表的设计广泛应用于数据挖掘模型训练前的数据准备，通过把相关字段放在同一张表中，可以大大提高数据挖掘模型训练过程中迭代计算时的效率问题。
+	      （简言之，空间换时间，便于训练迭代、减少表关联数量，修改少量数据时不需要该多张表）
+	窄表：严格按照数据库设计三范式。
+	      优点：数据冗余度很低。
+	      缺陷：修改一个数据可能需要修改多张表
+
+6、to_timestamp()函数：时间戳函数。
+	timestamp是一种日期类型，是date的扩展。
+	date类型只支持到秒，所以to_date()最小取到秒这个时间点，
+	而timestamp类型支持毫秒，且显示精度是6位，有效位是3位，即最大值达到999时，满1000ms就进位为1s。
+	两个date类型的日期相减得到的是两个时间的间隔，单位是天；
+	两个timestamp类型的日期相减得到的是多少天、多少小时、多少秒、多少毫秒等。
+	如：
+	SELECT (SYSDATE-TO_DATE('2017-11-01 00:00:00','YYYY-MM-DD HH24:MI:SS')) DATE相减 FROM DUAL;
+	返回结果：364.654143518519，单位为天
+	SELECT (SYSTIMESTAMP-TO_TIMESTAMP('2017-11-01 00:00:00','YYYY-MM-DD HH24:MI:SS')) TIMESTAMP相减 FROM DUAL;
+	返回结果：+000000364 15:43:02.674000000
+
+7、OVER(PARTITION BY)与GROUP BY的区别：
+　　	GROUP BY是对检索结果的保留行进行单纯分组，一般和聚合函数一起使用例如MAX、MIN、SUM、AVG、COUNT等一块用。
+	PARTITION BY虽然也具有分组功能，但同时也具有其他的高级功能，比如累计。
+	1、字面意思上来看，分组函数是对于整体而言的，分析函数是用来分析个体而言的，呈现的结果也验证了这一点；
+	2、对于GROUP BY而言，是从整体宏观上把握分组后的数据模块，对于PARTITION BY而言，它虽然也是讲数据分组，但是它是从每个数据模块的个体出发，进行相应操作的，比如上述工资总和，比如每个部门有100个员工，用了它之后会有100条求和累加数据显示出来；
+	总之一句话，GROUP BY将分组后的块看成一个整体，忽略个体；PARTITION BY也是看成整体，但是重视个体。
+
+8、COUNT() OVER(PARTITION BY...)：求分组后的总数
+　 RATIO_TO_REPORT() OVER(PARTITION BY ... ORDER BY ...)：RATIO_TO_REPORT()括号中为分子，OVER()括号中为分母。
+   PERCENT_RANK() OVER(PARTITION BY ... ORDER BY ...)：以0到1之间的分数形式返回某个值在数据分区中的排名。
+   FIRST_VALUE() OVER()：求第一个的数据
+   LAST_VALUE() OVER()：求最后一个的数据
+
+9、in跟exists的使用场景是什么样的？
+	当外表和内表两表的大小相当，那么用in和exists的差别不大；
+	当外表和内表两表的大小差距较大时，使用 in和exists 才有较大区别：
+    ！如果子查询得出的结果集记录较少，主查询中的表较大且又有索引时适合用 in；
+    ！如果主查询得出的结果集记录较少，子查询中的表较大且又有索引时适合用 exists；
+	使用exists时，是以外表为驱动表，先访问外表，执行主查询；使用in时，以内表为驱动，先访问内表，执行子查询；
+	in是把外表和内表作hash join连接；exists是对外表做loop循环，每次循环再对内表进行查询。
+	hash join:散列连接。使用两个表中较小的表（通常是小一点的那个表或数据源）利用连接键（join key）在内存中建立散列表，将列数据存储到hash列表中，然后扫描较大的表，同样对join key进行hash后探测散列表，找出与散列表匹配的行。
+	用法：SELECT A.* FROM A WHERE A.ID IN (SELECT B.A_ID FROM B);
+	      SELECT A.* FROM A WHERE EXISTS (SELECT B.A_ID FROM B);
+
+	not in和not exists：
+	    如果查询语句使用了not in，那么内外表都进行全表扫描，没有用到索引；而not extsts的子查询依然能用到表上的索引。所以无论那个表大，用not exists都比not in要快。
+
+10、DROP、TRUNCATE和DELETE：
+	DROP：1、是DDL，会隐式提交，操作立即生效，原数据不放到rolLlback segment中，无法回滚；
+	      2、会删除表结构和表中所有数据，并全部释放表占用的空间；
+	      3、会删除表结构所依赖的约束、触发器、索引;依赖于该表的存储过程/函数将保留，但会变成invalid状态;如果一张表A中的字段被其它表B作为外键约束依赖，则A表不能被直接DROP；
+	TRUNCATE:1、是DDL，会隐式提交，操作无法回滚；
+	         2、会删除表中所有记录，并重置高水线(HWM:所有oracle段(segment)都有一个在段内容纳数据的上限，这个上限就是HWM)和所有索引；缺省情况下将空间释放到minextents个extent(区)，除非使用resue stroage；操作不会记录日志，所以执行速度很快，但不能通过rollback撤销操作；
+		 3、对于外键约束引用的表，不能使用truncate table，应该使用不带where子句的delete子句；
+		 4、truncate table不能用于参与了索引、视图的表；
+		 5、要整理表内部的数据碎片时，可以使用truncate搭配resue stroage，再重新导入/插入数据；
+	DELETE：1、是DML，执行delete操作时，每次从表中删除一行记录，并同时将该行的删除操作记录在redo和undo表空间中以便进行
+	        回滚操作，但要注意表空间的容量要足够大，操作后要手动提交(commit)才能生效；
+		2、可根据查询条件删除表中满足条件的记录，如果不设置where子句，则删除表中所有记录；
+		3、delete语句不影响表所占用的extent(区)，高水线不受影响，保持原位置不变。
+	区别：1、delete语句执行时是一次删除一条记录并记录日志，可回滚；truncate是一次性将表中所有记录删除并释放表空间，不记
+	      录日志，执行速度很快，无法回滚；drop是将表结构和表中记录全部删除释放表空间，不记录日志，无法回滚；
+	      2、delete操作不会减少表或索引所占用的空间；当一个表被truncate后，这个表和索引所占用的空间会恢复到初始大小；drop语句将表所占用的空间全部释放；
+	      3、一般而言，速度上和范围上：drop > truncate > delete ；
+	      4、delete可以应用在表和视图上；truncate只能应用在table上；drop一般都可以应用；
+	注意：1、使用truncate和drop时要慎重，虽然可以恢复，但很麻烦，提前做好备份；
+	      2、如果要删除部分数据用delete，设置好where子句，同时保证回滚段要足够大；
+	         如果要删除表，使用drop；
+		 如果想保留表而删除所有数据且与事务无关，使用truncate，如果与事务有关或想触发触发器，使用delete；
+
+11、查看表结构:describe table_name 或 des table_name;
+
+12、转义字符
+	SQL语句中，遇到一些特殊字符，如："&"、"_"、"'" 等要进行转义处理。
+	&：UPDATE USERINFO SET PAGEURL='MYJSP?PAGE=1&PAGESIZE=10' WHERE ID='TEST';
+	   方法一：UPDATE USERINFO SET PAGEURL='MYJSP?PAGE=1'||'&'||'PAGESIZE=10' WHERE ID='TEST';
+	   方法二：UPDATE USERINFO SET PAGEURL='MYJSP?PAGE=1'||CHAR(38)||'PAGESIZE=10' WHERE ID='TEST';
+	_：SELECT * FROM D WHERE NAME LIKE 'A_%';
+	   查询结果是:A_B、AB，不符合预期，需要对 "_" 进行转义
+	   方法：SELECT * FROM D WHERE NAME LIKE 'A/_%' ESCAPE '/';
+	   此时查询结果为:A_B
+	'：转义字符 ' 单引号在PL/SQL中，两个单引号等于一个单引号
+	   如：SELECT '''' FROM DUAL;
+	   查询结果为：'
+	%：可以用ESCAPE定义转义字符后转义。
+	   SELECT * FROM D WHERE NAME LIKE '%\%%' ESCAPE '\';   第二个 % 被转义成普通字符。
+
+	SQL中ESCAPE的用法：
+		使用ESCAPE关键字定义转义符，在模式中，当转义符置于通配符之前时，该通配符就被解析为普通字符。
+		例如，要搜索在任意位置包含字符串 5% 的字符：COLUMN_NAME LIKE '%5/%%' ESCAPE '/'，前后两个 % 作为通配符使用，中间的 % 经过ESCAPE转义，作为普通字符使用。
+
+13、translate函数
+	translate是replace函数所提供的功能的一个超集。
+	语法：translate(String,from_str,to_str)
+	作用：函数最终返回的是将(所有出现在)from_str中的每个字符替换为to_str中的相应字符以后的String。
+	如果from_str比to_str更长，那么在from_str中而不在to_str中的额外字符将从String中删除，因为他们没有相应的替换字符；
+	to_str不允许为空，如果translate中有任何一个参数为空，那么返回结果也为空，因为oracle将空字符串解释为NULL。
+	例子：1、SELECT TRANSLATE('ABCDEFG','CDE','123') FROM DUAL;  返回结果：AB123FG
+		 SELECT TRANSLATE('ABCDEFGABC','ABC','123') FROM DUAL;  返回结果：123DEFG123
+		 SELECT TRANSLATE('AHIOBSAC','ABC','123') FROM DUAL;  返回结果：1HIO2S13
+	      2、SELECT TRANSLATE('ABCDEFG','CDE','1') FROM DUAL;  返回结果：AB1FG
+	      3、SELECT TRANSLATE('ABCDEFG','12CDE','1') FROM DUAL;  返回结果：ABFG
+	      4、SELECT TRANSLATE('ABCDEFG','12CDE','123') FROM DUAL;  返回结果：AB3FG
+	      5、SELECT TRANSLATE('ABCDEFG','123','123') FROM DUAL;  返回结果：ABCDEFG
+	      6、SELECT TRANSLATE('ABCDEFG','','123') FROM DUAL;  返回结果： 
+	      7、SELECT TRANSLATE('ABCDEFG','CDE','') FROM DUAL;  返回结果： 
+	      8、所有数字用9替换，所有字母用Y替换：
+	      SELECT 
+	      TRANSLATE('8768779CJSHCISA','0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ','9999999999YYYYYYYYYYYYYYYYYYYYYYYYYY') 
+	      FROM DUAL;  返回结果：9999999YYYYYYYY
+	      9、在一些信息保密软件中，常将用户姓名(如:伊赛莉亚)显示为 ***亚 形式，该操作也可以使用translate函数实现：
+	      	SELECT TRANSLATE(NAME,SUBSTR(NAME,1,LENGTH(NAME)-1),LPAD('*',LENGTH(NAME),'*')) FROM D;
+
+14、having子句和where子句的区别
+	where 和 having 都是对查询结果的一种筛选，为查询语句设定条件。两者之间区别如下：
+	1、where 不能放在 group by 后面使用；
+	2、having 是跟 group by 一起使用的，放在 group by 后面，此时作用相当于 where；
+	3、where 子句后面的条件中不能出现聚合函数，比如sum()，avg()等，而 having 后面可以。
+
+	聚合函数：聚合函数有时也叫统计函数，作用通常是对一组数据进行统计，比如求最大值、最小值、平均值等。聚合函数和其他函数根本区别在于聚合函数一般作用在多条记录上。
+	比如：SELECT CONUT(*) FROM A;这里就是统计A表中总共有多少条数据。
+
+	where子句：where子句仅仅作用于从from子句中返回的值，from子句返回的每一行数据都会用where子句中的条件进行判断筛选。where子句中允许使用比较运算符(<,>,<>等)和逻辑运算符(and,or,not)。
+	having子句：having子句通常是与group by一起使用的，having的作用是对使用group by进行分组统计后的结果进行进一步的筛选。
+
+	原理：在SQL语句查询过程中，聚合函数优先于having子句执行，where子句优先于聚合函数执行。
+
+15、数值函数：
+	mod(x,y)：取余函数，返回 x 除以 y 后的余数
+              如：SELECT MOD(1,2) FROM DUAL;  返回结果：1
+	sqrt(n)：开方函数，返回 n 的平方根
+              如：SELECT SQRT(4) FROM DUAL;  返回结果：2
+    日期函数：
+    	add_months(x,y)：返回日期 x 加上 y 个月的结果，y可以是任意整数(包括负数、0)，如果y包含小数，则小数部分将被截去。
+	      如：SELECT ADD_MONTHS(TO_DATE('2020-08-01','YYYY-MM-DD'),1.8) FROM DUAL;  返回结果：01-SEP-20
+	          SELECT ADD_MONTHS(TO_DATE('2020-08-01','YYYY-MM-DD'),-1) FROM DUAL;  返回结果：01-JUL-20
+	last_day(n)：返回包含日期 n 的月份的最后一天
+	      如：SELECT LAST_DAY(TO_DATE('2020-09-01','YYYY-MM-DD')) FROM DUAL;  返回结果：30-SEP-20
+	months_between(x1,x2)：返回x1和x2之间相差的月数目(x1-x2)：
+	      如：SELECT MONTHS_BETWEEN(TO_DATE('2020-09-01','YYYY-MM-DD'),TO_DATE('2020-06-01','YYYY-MM-DD')) FROM DUAL;
+	          返回结果：3
+	          SELECT MONTHS_BETWEEN(TO_DATE('2020-09-01','YYYY-MM-DD'),TO_DATE('2020-09-02','YYYY-MM-DD')) FROM DUAL;
+		  返回结果：-.03225806
+	next_day(m,n)：返回日期 m 由 n 给出的条件后的第一天，n使用当前会话中给出的语言指定了一周中的某一天：
+	      如：SELECT NEXT_DAY(TO_DATE('2020-10-01','YYYY-MM-DD'),'MONDAY') FROM DUAL;  返回结果：05-OCT-20
+	round(d[,fmt])：返回 fmt 指定格式的日期 d ，用法和round函数一样：
+	      1、当fmt为YEAR时，按1-6月小和7-12月大，进行四舍五入到最近的yyyy年1月1号
+	      如：SELECT ROUND(TO_DATE('2020-08-01','YYYY-MM-DD'),'YEAR') FROM DUAL;  返回结果：01-JAN-21
+	      2、当fmt为MONTH时，按1-15号和16-30(31)号，四舍五入到最近的mm月1号
+	      如：SELECT ROUND(TO_DATE('2020-08-07','YYYY-MM-DD'),'MONTH') FROM DUAL;  返回结果：01-AUG-20
+	      3、当fmt为DAY时，按周一至周三和周四至周日，四舍五入到最近的周日
+	      如：SELECT ROUND(TO_DATE('2020-08-13','YYYY-MM-DD'),'DAY') FROM DUAL;  返回结果：16-AUG-20
+
+16、笛卡尔积
+	笛卡尔积在SQL中的实现方式即是交叉连接(Cross Join)。所有连接方式都会先生成临时笛卡尔积表，笛卡尔积是关系代数里的一个概念，表示两个表中每一行数据任意组合。
+	在实际应用中，笛卡尔积本身实际用处不大，只有在两个表连接时加上限制条件，才会有实际意义。
+	笛卡尔积产生的原因：
+	1、表连接缺少关联条件；(解决方式：修改SQL，加上限制条件)
+	2、表连接有关联条件，但Oracle判断用笛卡尔积更快，此时要看实际执行速度；oracle作出这种判断一般是表比较小的情况下，这时要特别检查表的数据量是否真的很少，以免误判。(检查执行计划时间，若与实际相符，可不作优化；若与实际不同，采用hint方式，改变SQL执行过程)
+	hint参考：https://www.cnblogs.com/emilyyoucan/p/7844795.html
+
+17、
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+										---Written by Altair
+										https://github.com/Altair0109/SQL_Based
+										---version 1.7 (2020.8.13)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         心猿意马,思绪飘零,杂乱无章,游思妄想,心烦意乱,欲言又止
